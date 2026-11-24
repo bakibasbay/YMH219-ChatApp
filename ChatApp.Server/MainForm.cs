@@ -177,9 +177,9 @@ public partial class MainForm : Form
         if (width <= 0)
             return;
 
-        colEndPoint.Width = (int)(width * 0.27);
+        colEndPoint.Width = (int)(width * 0.25);
         colConnectedAt.Width = (int)(width * 0.31);
-        colMessageCount.Width = (int)(width * 0.16);
+        colMessageCount.Width = (int)(width * 0.19);
         colUserName.Width = width - colEndPoint.Width - colConnectedAt.Width - colMessageCount.Width;
 
         _lblEmptyClients.Bounds = new Rectangle(0, 40, width, Math.Max(40, lvClients.ClientSize.Height - 40));

@@ -15,10 +15,28 @@ public class UserListBox : ListBox
     public UserListBox()
     {
         DrawMode = DrawMode.OwnerDrawFixed;
-        ItemHeight = 44;
         BorderStyle = BorderStyle.None;
         IntegralHeight = false;
         SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+        ItemHeight = RowHeight;
+    }
+
+    // Satır yüksekliği yazı tiplerinin gerçek piksel yüksekliğinden hesaplanır (yüksek DPI'da kırpılma olmaz)
+    private int NameHeight => TextRenderer.MeasureText("Ağ", _nameFont).Height;
+    private int HintHeight => TextRenderer.MeasureText("Ağ", _hintFont).Height;
+    private int RowPadding => Math.Max(4, NameHeight / 4);
+    private int RowHeight => NameHeight + HintHeight + 2 * RowPadding;
+
+    protected override void OnFontChanged(EventArgs e)
+    {
+        base.OnFontChanged(e);
+        ItemHeight = RowHeight;
+    }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        ItemHeight = RowHeight;
     }
 
     // Oturumdaki kullanıcı ("sen" etiketi için)
@@ -83,20 +101,23 @@ public class UserListBox : ListBox
             g.FillPath(brush, path);
         }
 
-        // Avatar ve çevrimiçi noktası
-        var avatar = new Rectangle(bounds.X + 12, bounds.Y + (bounds.Height - 30) / 2, 30, 30);
+        // Avatar ve sağ altta çevrimiçi noktası
+        int pad = RowPadding;
+        int avatarSize = bounds.Height - 2 * pad;
+        var avatar = new Rectangle(bounds.X + 2 * pad, bounds.Y + pad, avatarSize, avatarSize);
         Theme.DrawAvatar(g, avatar, user, _avatarFont);
         g.SmoothingMode = SmoothingMode.AntiAlias;
-        var dot = new Rectangle(avatar.Right - 9, avatar.Bottom - 9, 10, 10);
-        using (var ring = new SolidBrush(BackColor))
+        int dotSize = Math.Max(8, avatarSize / 4);
+        var dot = new Rectangle(avatar.Right - dotSize + 2, avatar.Bottom - dotSize + 2, dotSize, dotSize);
+        using (var ring = new SolidBrush(rowColor != Color.Empty ? rowColor : BackColor))
             g.FillEllipse(ring, Rectangle.Inflate(dot, 2, 2));
         using (var green = new SolidBrush(Theme.Success))
             g.FillEllipse(green, dot);
 
         // Ad ve alt bilgi
-        int textX = avatar.Right + 10;
-        var nameRect = new Rectangle(textX, bounds.Y + 5, bounds.Right - textX - 8, 20);
-        var hintRect = new Rectangle(textX, bounds.Y + 23, bounds.Right - textX - 8, 16);
+        int textX = avatar.Right + 2 * pad;
+        var nameRect = new Rectangle(textX, bounds.Y + pad, bounds.Right - textX - pad, NameHeight);
+        var hintRect = new Rectangle(textX, nameRect.Bottom, bounds.Right - textX - pad, HintHeight);
         TextRenderer.DrawText(g, user, _nameFont, nameRect, Theme.Text,
             TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
 

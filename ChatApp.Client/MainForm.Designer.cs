@@ -374,7 +374,7 @@ namespace ChatApp.Client
             //
             this.btnClearChat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClearChat.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnClearChat.Location = new System.Drawing.Point(486, 7);
+            this.btnClearChat.Location = new System.Drawing.Point(476, 7);
             this.btnClearChat.Name = "btnClearChat";
             this.btnClearChat.Size = new System.Drawing.Size(90, 30);
             this.btnClearChat.TabIndex = 1;
@@ -385,7 +385,7 @@ namespace ChatApp.Client
             //
             this.btnSaveHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSaveHistory.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnSaveHistory.Location = new System.Drawing.Point(586, 7);
+            this.btnSaveHistory.Location = new System.Drawing.Point(576, 7);
             this.btnSaveHistory.Name = "btnSaveHistory";
             this.btnSaveHistory.Size = new System.Drawing.Size(180, 30);
             this.btnSaveHistory.TabIndex = 2;

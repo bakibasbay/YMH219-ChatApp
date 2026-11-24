@@ -51,6 +51,9 @@ public class ChatView : Control
 
     public int MessageCount => _items.Count;
 
+    // Piksel ölçülerini ekran DPI değerine göre ölçekler (ör. %125 ölçeklemede 16 → 20)
+    private int S(int value) => (int)Math.Round(value * DeviceDpi / 96f);
+
     // Yeni mesaj ekler; kullanıcı en alttaysa veya mesaj kendisininse en alta kaydırır
     public void AddMessage(ChatMessage message)
     {
@@ -58,9 +61,9 @@ public class ChatView : Control
         var item = new ChatItem(message, KindOf(message));
         LayoutItem(item, LayoutWidth);
 
-        item.Top = _items.Count == 0 ? Pad : _items[^1].Top + _items[^1].Height + ItemSpacing;
+        item.Top = _items.Count == 0 ? S(Pad) : _items[^1].Top + _items[^1].Height + S(ItemSpacing);
         _items.Add(item);
-        _contentHeight = item.Top + item.Height + Pad;
+        _contentHeight = item.Top + item.Height + S(Pad);
 
         bool own = item.Kind is BubbleKind.Own or BubbleKind.OwnPrivate;
         UpdateScrollBar(stickToBottom || own);
@@ -115,7 +118,7 @@ public class ChatView : Control
     private void LayoutSystem(ChatItem item, int width)
     {
         item.Text = $"{item.Message.Content}   ·   {item.Time}";
-        int maxText = width - 2 * Pad - 60;
+        int maxText = width - 2 * S(Pad) - 60;
         var size = TextRenderer.MeasureText(item.Text, _systemFont, new Size(maxText, int.MaxValue), WrapFlags);
 
         int w = size.Width + 28;
@@ -130,17 +133,17 @@ public class ChatView : Control
     {
         item.Header = "SUNUCU DUYURUSU";
         item.Text = item.Message.Content;
-        int maxText = (int)(width * 0.7) - 2 * BubblePadX;
+        int maxText = (int)(width * 0.7) - 2 * S(BubblePadX);
 
         var header = TextRenderer.MeasureText(item.Header + "  ·  " + item.Time, _headerFont, Size.Empty, LineFlags);
         var text = TextRenderer.MeasureText(item.Text, _textFont, new Size(maxText, int.MaxValue), WrapFlags);
         int inner = Math.Min(maxText, Math.Max(header.Width, text.Width));
 
-        int w = inner + 2 * BubblePadX;
-        int h = BubblePadY + header.Height + 4 + text.Height + BubblePadY;
+        int w = inner + 2 * S(BubblePadX);
+        int h = S(BubblePadY) + header.Height + 4 + text.Height + S(BubblePadY);
         item.Bubble = new Rectangle((width - w) / 2, 0, w, h);
-        item.HeaderRect = new Rectangle(item.Bubble.X + BubblePadX, BubblePadY, inner, header.Height);
-        item.TextRect = new Rectangle(item.Bubble.X + BubblePadX, item.HeaderRect.Bottom + 4, inner, text.Height);
+        item.HeaderRect = new Rectangle(item.Bubble.X + S(BubblePadX), S(BubblePadY), inner, header.Height);
+        item.TextRect = new Rectangle(item.Bubble.X + S(BubblePadX), item.HeaderRect.Bottom + 4, inner, text.Height);
         item.Height = h;
     }
 
@@ -159,8 +162,8 @@ public class ChatView : Control
         };
         item.Text = m.Content;
 
-        int maxBubble = (int)((width - 2 * Pad - AvatarSize - AvatarGap) * 0.7);
-        int maxText = Math.Max(80, maxBubble - 2 * BubblePadX);
+        int maxBubble = (int)((width - 2 * S(Pad) - S(AvatarSize) - S(AvatarGap)) * 0.7);
+        int maxText = Math.Max(80, maxBubble - 2 * S(BubblePadX));
 
         var text = TextRenderer.MeasureText(item.Text, _textFont, new Size(maxText, int.MaxValue), WrapFlags);
         var time = TextRenderer.MeasureText(item.Time, _timeFont, Size.Empty, LineFlags);
@@ -168,31 +171,31 @@ public class ChatView : Control
 
         int inner = Math.Min(maxText, Math.Max(text.Width, Math.Max(header.Width, time.Width)));
         int headerHeight = item.Header is null ? 0 : header.Height + 3;
-        int h = BubblePadY + headerHeight + text.Height + 3 + time.Height + BubblePadY - 2;
-        int w = inner + 2 * BubblePadX;
+        int h = S(BubblePadY) + headerHeight + text.Height + 3 + time.Height + S(BubblePadY) - 2;
+        int w = inner + 2 * S(BubblePadX);
 
-        int x = own ? width - Pad - w : Pad + AvatarSize + AvatarGap;
+        int x = own ? width - S(Pad) - w : S(Pad) + S(AvatarSize) + S(AvatarGap);
         item.Bubble = new Rectangle(x, 0, w, h);
-        item.HeaderRect = new Rectangle(x + BubblePadX, BubblePadY, inner, header.Height);
-        item.TextRect = new Rectangle(x + BubblePadX, BubblePadY + headerHeight, inner, text.Height);
-        item.TimeRect = new Rectangle(x + BubblePadX, item.TextRect.Bottom + 3, inner, time.Height);
+        item.HeaderRect = new Rectangle(x + S(BubblePadX), S(BubblePadY), inner, header.Height);
+        item.TextRect = new Rectangle(x + S(BubblePadX), S(BubblePadY) + headerHeight, inner, text.Height);
+        item.TimeRect = new Rectangle(x + S(BubblePadX), item.TextRect.Bottom + 3, inner, time.Height);
         // Avatar baloncuğun alt hizasında, yalnızca başkalarının mesajlarında
-        item.Avatar = own ? Rectangle.Empty : new Rectangle(Pad, h - AvatarSize, AvatarSize, AvatarSize);
+        item.Avatar = own ? Rectangle.Empty : new Rectangle(S(Pad), h - S(AvatarSize), S(AvatarSize), S(AvatarSize));
         item.Height = h;
     }
 
     private void RelayoutAll()
     {
         int width = LayoutWidth;
-        int top = Pad;
+        int top = S(Pad);
         foreach (var item in _items)
         {
             LayoutItem(item, width);
             item.Top = top;
-            top += item.Height + ItemSpacing;
+            top += item.Height + S(ItemSpacing);
         }
 
-        _contentHeight = _items.Count == 0 ? 0 : top - ItemSpacing + Pad;
+        _contentHeight = _items.Count == 0 ? 0 : top - S(ItemSpacing) + S(Pad);
     }
 
     // ---------- Kaydırma ----------
@@ -358,9 +361,9 @@ public class ChatView : Control
     }
 
     // Köşe yarıçapları farklı yuvarlak dikdörtgen (kendi mesajında sağ alt, diğerlerinde sol alt köşe sivri)
-    private static GraphicsPath BubblePath(Rectangle r, bool own)
+    private GraphicsPath BubblePath(Rectangle r, bool own)
     {
-        int big = Math.Min(Radius * 2, Math.Min(r.Width, r.Height));
+        int big = Math.Min(S(Radius) * 2, Math.Min(r.Width, r.Height));
         int small = Math.Min(8, big);
         int tl = big, tr = big, br = own ? small : big, bl = own ? big : small;
 
