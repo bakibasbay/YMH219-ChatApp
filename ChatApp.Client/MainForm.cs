@@ -274,9 +274,8 @@ public partial class MainForm : Form
 
         lblPrivateMode.Text = $"@{TurkishText.Dative(user)} özel mesaj yazıyorsunuz – mesajı yalnızca {user} görecek.  (Esc: herkese yaz)";
         pnlPrivateBanner.Visible = true;
-        pnlMessageBox.BackColor = txtMessage.BackColor = PrivateInputBack;
         btnSend.Text = "Özel Gönder";
-        UpdatePlaceholder();
+        UpdateComposeArea();
         txtMessage.Focus();
     }
 
@@ -287,10 +286,8 @@ public partial class MainForm : Form
         lstUsers.Invalidate();
 
         pnlPrivateBanner.Visible = false;
-        pnlMessageBox.BackColor = txtMessage.BackColor = Color.White;
-        pnlMessageBox.Invalidate();
         btnSend.Text = "Gönder";
-        UpdatePlaceholder();
+        UpdateComposeArea();
     }
 
     private void btnCancelPrivate_Click(object? sender, EventArgs e)
@@ -365,7 +362,7 @@ public partial class MainForm : Form
         btnSend.Enabled = connected && txtMessage.Text.Trim().Length > 0;
         lstUsers.Enabled = connected;
         btnSaveHistory.Enabled = btnClearChat.Enabled = _history.Count > 0;
-        UpdatePlaceholder();
+        UpdateComposeArea();
 
         switch (_state)
         {
@@ -382,6 +379,17 @@ public partial class MainForm : Form
                 Text = "Chat İstemcisi – Bağlı değil";
                 break;
         }
+    }
+
+    // Mesaj kutusunun zemini ve ipucu yazısı duruma göre: pasif (gri), herkese (beyaz), özel (açık turuncu)
+    private void UpdateComposeArea()
+    {
+        Color back = _state != ConnectionState.Connected ? SystemColors.Control
+                   : _privateTarget is not null ? PrivateInputBack
+                   : Color.White;
+        pnlMessageBox.BackColor = txtMessage.BackColor = back;
+        pnlMessageBox.Invalidate();
+        UpdatePlaceholder();
     }
 
     private void UpdatePlaceholder()
