@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Sunucu ve istemcinin ortak kullandığı mesaj modeli, protokol ve arayüz bileşenleri -->
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>ChatApp.Shared</RootNamespace>
+    <AssemblyName>ChatApp.Shared</AssemblyName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+</Project>
